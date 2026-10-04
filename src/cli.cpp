@@ -13,6 +13,15 @@ bool parse_u32(const char* text, std::uint32_t& out) {
     return text != end && result.ec == std::errc() && result.ptr == end;
 }
 
+bool parse_hex(const char* text, std::uint32_t& out) {
+    const char* begin = text;
+    const char* end = text + std::strlen(text);
+    if (end - begin > 2 && begin[0] == '0' && (begin[1] == 'x' || begin[1] == 'X')) begin += 2;
+    if (begin == end) return false;
+    auto result = std::from_chars(begin, end, out, 16);
+    return result.ec == std::errc() && result.ptr == end;
+}
+
 }  // namespace
 
 bool parse_args(int argc, char* argv[], Options& options, std::string& error) {
@@ -29,6 +38,20 @@ bool parse_args(int argc, char* argv[], Options& options, std::string& error) {
                 return false;
             }
             options.trace_path = arg;
+            continue;
+        }
+
+        if (arg == "--decode") {
+            if (i + 1 >= argc) {
+                error = "missing value for --decode";
+                return false;
+            }
+            const char* value = argv[++i];
+            if (!parse_hex(value, options.decode_addr)) {
+                error = std::string("invalid value for --decode: ") + value;
+                return false;
+            }
+            options.decode = true;
             continue;
         }
 
@@ -60,7 +83,7 @@ bool parse_args(int argc, char* argv[], Options& options, std::string& error) {
         error = "window must be at least 1";
         return false;
     }
-    if (options.trace_path.empty()) {
+    if (options.trace_path.empty() && !options.decode) {
         error = "no trace file given";
         return false;
     }
