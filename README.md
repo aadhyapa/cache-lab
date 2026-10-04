@@ -8,8 +8,10 @@ how bad is the worst case? Safety-critical software is judged on worst-case
 timing, not average speed, and a cache hit and a miss differ in cost by roughly
 100x.
 
-**Status: in progress.** The simulator, tests and workload generators exist;
-experiment results and the write-up are not done yet.
+**Status: first pass complete.** The simulator, 15 requirements with tests, the
+workload generators, the experiments and the write-up
+([notebooks/results.ipynb](notebooks/results.ipynb)) are done. Stretch goals
+(two-level cache, prefetch toggle, viewer) are not started.
 
 ## Build and test
 
@@ -17,6 +19,8 @@ experiment results and the write-up are not done yet.
 make test           # build with -Wall -Wextra -Werror, run the tests
 make test SAN=1     # same, under AddressSanitizer and UBSan
 make matrix         # regenerate docs/traceability.md
+make setup          # once: install pandas, matplotlib, notebook
+make experiments    # run the workloads, write results/results.csv and results/plots/
 ```
 
 ## Run
@@ -82,7 +86,41 @@ predictions to test, not results.
 
 ## Results
 
-Not done yet.
+Eight traces (six workloads, two of them with two variants) run through the
+simulator at the default cache (64 sets, 4 ways, 32-byte lines = 8 KB; hit 1
+cycle, miss 100 cycles). The worst window is the largest total cost over any 100
+consecutive accesses; the most it can be is 10,000 cycles.
+
+| Workload | Hit rate | Total cycles | Worst 100-access window |
+|---|---|---|---|
+| ring | 98.4% | 20,864 | 1,387 |
+| movavg | 99.99% | 65,792 | 892 |
+| structs, array of structs | 0.0% | 100,000 | 10,000 |
+| structs, struct of arrays | 87.5% | 13,375 | 1,387 |
+| traversal, row order | 87.5% | 54,784 | 1,387 |
+| traversal, column order | 0.0% | 409,600 | 10,000 |
+| conflict | 99.9% | 4,492 | 496 |
+| coldstart | 97.5% | 26,688 | 1,387 |
+
+What the runs show:
+
+- **Layout alone moves the same work from 13 to 100 cycles per access.** Struct
+  of arrays and row-major order have 8x fewer misses than array of structs and
+  column order.
+- **Buffer placement can cause a large swing.** Two buffers a multiple of
+  (sets x line size) apart miss on every access with 1 way (0% hits, 10,000-cycle
+  window) and almost never with 2 ways (99.9%, 496).
+- **The first run is the worst run.** Coldstart's worst window is 1,387 cycles
+  against 100 once warm. With 16-byte lines the cache (4 KB) is smaller than the
+  6 KB table, so it never warms up: the hit rate stays at 75%.
+- **Averages hide the worst case.** Ring, movavg, conflict and coldstart have a
+  worst window 4 to 9 times their mean cost per access.
+
+Per-workload plots are in [results/plots/](results/plots/) and the raw numbers
+in [results/results.csv](results/results.csv). The sweeps change one parameter
+at a time with 64 sets fixed, so changing ways or line size also changes
+capacity. The placement seed does not change the results: the base address is
+64 KB aligned, which maps to the same sets.
 
 ## Limitations
 
