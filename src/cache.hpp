@@ -32,11 +32,9 @@ class Cache {
 public:
     explicit Cache(const CacheConfig& cfg);
 
-    // decode address
     Address decode(std::uint32_t addr) const { return decode_address(cfg_, addr); }
     AccessResult access(AccessType type, std::uint32_t addr);
 
-    // calculate total cycles
     std::uint64_t total_cycles() const;
 
     const Stats& stats() const { return stats_; }
@@ -50,7 +48,6 @@ private:
         std::uint64_t last_used = 0;
     };
 
-    // storage
     Line* set_begin(std::uint32_t set) { return &lines_[std::size_t(set) * cfg_.ways]; }
 
     CacheConfig cfg_;

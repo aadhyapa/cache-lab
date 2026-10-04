@@ -5,8 +5,8 @@ For every workload (and variant) it sweeps ONE parameter, keeping everything
 else at the defaults (64 sets, 4 ways, 32-byte lines, hit 1 cycle, miss 100,
 writeback 0, window 100):
 
-  ring, movavg, structs, coldstart   line size 16, 32, 64
-  traversal, conflict                ways 1 to 8
+  ring, movavg, structs, coldstart  (line size 16, 32, 64)
+  traversal, conflict (ways 1 to 8)
 
 Sets stay at 64, so changing ways or line size also changes capacity; the
 capacity_bytes column records it. The cost model is never changed.

@@ -13,7 +13,6 @@ int main(int argc, char* argv[]) {
     cachelab::Options options;
     std::string error;
 
-    // parse arguments
     if (!cachelab::parse_args(argc, argv, options, error) ||
         !options.config.validate(error)) {
         std::cerr << "error: " << error << '\n';
@@ -29,7 +28,6 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    // opening trace file and error handling
     std::ifstream trace_file(options.trace_path);
     if (!trace_file) {
         std::cerr << "error: cannot open trace file: " << options.trace_path << '\n';

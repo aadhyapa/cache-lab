@@ -17,7 +17,7 @@ import pandas as pd  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-# Reference palette, light mode: surface, ink tokens, categorical slots 1 and 2.
+# Colors
 SURFACE, INK, INK_2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
 SERIES = ["#2a78d6", "#eb6834"]
 
