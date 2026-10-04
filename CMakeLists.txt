@@ -9,6 +9,8 @@ add_executable(cache_lab
         src/cli.hpp
         src/cache_config.cpp
         src/cache.cpp
+        src/report.cpp
+        src/report.hpp
         src/trace.cpp
         src/trace.hpp
         src/access.hpp
