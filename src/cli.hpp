@@ -14,10 +14,6 @@ struct Options {
     bool json = false;           // CL-010: --json
 };
 
-// Parses the command line into `options`, which starts from its defaults.
-// Only checks the command line itself (unknown flag, missing or non-numeric
-// value, no trace file); config values are checked by CacheConfig::validate.
-// On failure fills `error` and returns false.
 bool parse_args(int argc, char* argv[], Options& options, std::string& error);
 
 }  // namespace cachelab
